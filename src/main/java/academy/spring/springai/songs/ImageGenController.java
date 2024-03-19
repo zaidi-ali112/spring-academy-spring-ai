@@ -13,9 +13,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class ImageGenController {
 
 	// Insert ImageClient variable and class constructor
+	private final ImageClient imageClient;
 
+	public ImageGenController(ImageClient imageClient) {
+		this.imageClient = imageClient;
+	}
 
 	// Create endpoint to generate an image
+	@PostMapping("/imagegen")
+	public String imageGen(@RequestBody ImageGenRequest request) {
+		ImageOptions options = ImageOptionsBuilder.builder()
+				.withModel("dall-e-3")
+				.build();
+		ImagePrompt imagePrompt = new ImagePrompt(request.prompt(), options);
+		ImageResponse response = imageClient.call(imagePrompt);
+		String imageUrl = response.getResult().getOutput().getUrl();
 
+		return "redirect:" + imageUrl;
+	}
 
 }
